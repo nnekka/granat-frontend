@@ -3,13 +3,23 @@ import granatService from './services/granat'
 import 'bootstrap/dist/css/bootstrap.css';
 import {Table, Button} from 'react-bootstrap'
 
-
 const App = () => {
     const [temp, setTemp] = useState(1)
     const [plusMinus, setPlusminus] = useState(2)
     const [mode, setMode] = useState(0)
     const [onOff, setOnOff] = useState(0)
     const [stroka, setStroka] = useState('')
+
+    const initStateFromServer = () => {
+        granatService.getSettings().then((resp) => {
+            const [ temp, plusMinus, mode, on ] = resp.split(',').map(Number);
+            setTemp(temp);
+            setPlusminus(plusMinus);
+            setMode(mode);
+            setOnOff(on);
+        })
+    }
+    initStateFromServer()
 
     const onChangeTemp = (event) => {
       if (event.target.value <30 && event.target.value > -20){
@@ -48,7 +58,6 @@ const App = () => {
     }
 
     const sendSettings = (event) => {
-
         const str = temp + ',' + plusMinus + ',' + mode + ',' + onOff
         setStroka(str)
         granatService.sendStroka(str)
